@@ -1,6 +1,6 @@
 #use a node base image
 FROM centos:latest
-
+USER jenkins
 # set maintainer
 LABEL maintainer "shridhark1888@gmail.com"
 
