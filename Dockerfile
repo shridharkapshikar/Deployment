@@ -1,13 +1,16 @@
-#use a node base image
-FROM centos:latest
-USER jenkins
-# set maintainer
-LABEL maintainer "shridhark1888@gmail.com"
-
-# set a health check
-HEALTHCHECK --interval=5s \
-            --timeout=5s \
-            CMD curl -f http://127.0.0.1:8000 || exit 1
-
-# tell docker what port to expose
-EXPOSE 8000
+FROM ubuntu:xenial
+MAINTAINER shridhar.kapshikar@yahoo.com
+#CMD setproxy
+ENV http_proxy http://10.32.234.41:8080
+ENV https_proxy http:// 10.32.234.41:8080
+RUN apt-get update
+RUN apt-get -y install apt-utils
+RUN apt-get -y install apache2
+# Add configuration file
+ADD action /var/www/cgi-bin/action
+RUN echo "PassEnv DB_SERVICE_SERVICE_HOST" >> /etc/httpd/conf/httpd.conf
+RUN chown root:apache /var/www/cgi-bin/action
+RUN chmod 755 /var/www/cgi-bin/action
+RUN echo "The Web Server is Running" > /var/www/html/index.html
+EXPOSE 80
+CMD /usr/sbin/apache2ctl -D FOREGROUND
