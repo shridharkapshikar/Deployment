@@ -1,34 +1,18 @@
-# Webserver container with CGI python script
-# Using RHEL 7 base image and Apache Web server
-# Version 1
+FROM centos:7
+MAINTAINER TECO
+LABEL Vendor="CentOS" \
+      License=GPLv2 \
+      Version=2.4.6-40
 
-# Pull the rhel image from the local repository
-FROM centos:latest
-USER root
 
-MAINTAINER Maintainer_Name
-ENV http_proxy http://10.32.234.41:8080
-ENV https_proxy http:// 10.32.234.41:8080
+RUN yum -y --setopt=tsflags=nodocs update && \
+    yum -y --setopt=tsflags=nodocs install httpd && \
+    yum clean all
 
-# Fix per https://bugzilla.redhat.com/show_bug.cgi?id=1192200
-#RUN yum -y install deltarpm yum-utils --disablerepo=*-eus-* --disablerepo=*-htb-* \
-#    --disablerepo=*-ha-* --disablerepo=*-rt-* --disablerepo=*-lb-* --disablerepo=*-rs-* --disablerepo=*-sap-*
-
-#RUN yum-config-manager --disable *-eus-* *-htb-* *-ha-* *-rt-* *-lb-* *-rs-* *-sap-* > /dev/null
-
-# Update image
-RUN yum update -y
-RUN yum install httpd procps-ng MySQL-python -y
-
-# Add configuration file
-#ADD action /var/www/cgi-bin/action
-RUN echo "PassEnv DB_SERVICE_SERVICE_HOST" >> /etc/httpd/conf/httpd.conf
-#RUN chown root:apache /var/www/cgi-bin/action
-#RUN chmod 755 /var/www/cgi-bin/action
-RUN echo "The Web Server is Running" > /var/www/html/index.html
 EXPOSE 80
 
-# Start the service
-CMD ["-D", "FOREGROUND"]
-ENTRYPOINT ["/usr/sbin/httpd"]
+# Simple startup script to avoid some issues observed with container restart
+ADD run-httpd.sh /run-httpd.sh
+RUN chmod -v +x /run-httpd.sh
 
+CMD ["/run-httpd.sh"]
