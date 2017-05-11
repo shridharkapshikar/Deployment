@@ -4,6 +4,8 @@ LABEL Vendor="CentOS" \
       License=GPLv2 \
       Version=2.4.6-40
 
+ENV http_proxy http://10.32.234.41:8080
+ENV https_proxy http:// 10.32.234.41:8080
 
 RUN yum -y update && \
     yum -y install httpd && \
